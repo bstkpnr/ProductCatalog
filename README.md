@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # ![# Product Catalog
+=======
+# Product Catalog
+>>>>>>> 9a1815125d80e69e4b05d3da70b82bd55584ed9a
 
 A mobile application built with React Native for browsing and searching products.
 
@@ -72,11 +76,11 @@ A mobile application built with React Native for browsing and searching products
 
 ### 👋
 <div class="d-flex align-items-center justify-content-center" style="height: 250px;">
-<img src="assets/imgages/img4.png" width='200px'>
-<img src="assets/imgages/img1.png" width='200px'>
-<img src="assets/imgages/img2.png" width='200px'>
-<img src="assets/imgages/img3.png" width='200px'>
-<img src="assets/imgages/img5.png" width='200px'>
+<img src="assets/images/img4.png" width='200px'>
+<img src="assets/images/img1.png" width='200px'>
+<img src="assets/images/img2.png" width='200px'>
+<img src="assets/images/img3.png" width='200px'>
+<img src="assets/images/img5.png" width='200px'>
 
 
 </div>
