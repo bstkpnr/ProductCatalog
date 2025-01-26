@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Animated,
+  Platform,
 } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +22,7 @@ import {
 import { RootState } from "../store";
 import { IProduct } from "../types/product";
 import { RootStackParamList } from "../_layout";
+
 type ProductDetailScreenRouteProp = RouteProp<
   RootStackParamList,
   "ProductDetail"
@@ -36,6 +39,8 @@ export default function ProductDetail() {
 
   const favorites = useSelector((state: RootState) => state.favorites.items);
   const isFavorite = favorites.some((item) => item.id === id);
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const loadProduct = async () => {
     try {
@@ -56,6 +61,19 @@ export default function ProductDetail() {
 
   const handleToggleFavorite = () => {
     if (!product) return;
+
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.5,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
     if (isFavorite) {
       dispatch(removeFromFavorites(product.id));
@@ -83,36 +101,49 @@ export default function ProductDetail() {
 
   return (
     <ScrollView style={styles.container} bounces={false}>
-      <ImageCarousel images={product.images} />
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{product.title}</Text>
-          <TouchableOpacity
-            onPress={handleToggleFavorite}
-            style={styles.favoriteButton}
-          >
+      <View style={styles.imageSection}>
+        <ImageCarousel images={product.images} />
+        {product.discountPercentage > 0 && (
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountBadgeText}>
+              -{product.discountPercentage}%
+            </Text>
+          </View>
+        )}
+        <TouchableOpacity
+          onPress={handleToggleFavorite}
+          style={styles.favoriteIcon}
+          activeOpacity={0.7}
+          accessibilityLabel={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          accessibilityRole="button"
+        >
+          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
               size={28}
-              color={isFavorite ? "#F44336" : "#666"}
+              color={isFavorite ? "#FF6B6B" : "#FFFFFF"}
             />
-          </TouchableOpacity>
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.title}>{product.title}</Text>
         </View>
 
-        <Text style={styles.price}>
-          ${product.price.toFixed(2)}
+        <View style={styles.priceContainer}>
+          <Text style={styles.price}>${product.price.toFixed(2)}</Text>
           {product.discountPercentage > 0 && (
-            <Text style={styles.discount}>
-              {" "}
-              ({product.discountPercentage}% indirim)
+            <Text style={styles.originalPrice}>
+              ${ (product.price / (1 - product.discountPercentage / 100)).toFixed(2)}
             </Text>
           )}
-        </Text>
+        </View>
 
         <Text
           style={[
             styles.stock,
-            { color: product.stock > 0 ? "#4CAF50" : "#F44336" },
+            { color: product.stock > 0 ? "#28a745" : "#dc3545" },
           ]}
         >
           {product.stock > 0 ? `Stok: ${product.stock}` : "Stokta Yok"}
@@ -120,44 +151,85 @@ export default function ProductDetail() {
 
         <Text style={styles.sectionTitle}>Ürün Açıklaması</Text>
         <Text style={styles.description}>{product.description}</Text>
+
+        {product.details && (
+          <View style={styles.details}>
+            {Object.entries(product.details).map(([key, value]) => (
+              <View style={styles.detailItem} key={key}>
+                <Text style={styles.detailLabel}>{key}</Text>
+                <Text style={styles.detailValue}>{value}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
+  },
+  imageSection: {
+    position: "relative",
+    backgroundColor: "#f0f0f0",
+  },
+  discountBadge: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    backgroundColor: "#28a745",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  discountBadgeText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  favoriteIcon: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 30,
+    padding: 8,
   },
   content: {
-    padding: 16,
+    padding: 20,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 8,
+    alignItems: "center",
+    marginBottom: 12,
   },
   title: {
     flex: 1,
     fontSize: 24,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#000000",
     marginRight: 16,
   },
-  favoriteButton: {
-    padding: 4,
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
   },
   price: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#2196F3",
-    marginBottom: 8,
+    color: "#FF6B6B",
   },
-  discount: {
-    fontSize: 16,
-    color: "#4CAF50",
+  originalPrice: {
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#888888",
+    textDecorationLine: "line-through",
+    marginLeft: 10,
   },
   stock: {
     fontSize: 16,
@@ -165,34 +237,35 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: "#333333",
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: "#666",
+    color: "#555555",
     marginBottom: 24,
   },
   details: {
     backgroundColor: "#f5f5f5",
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
   },
   detailItem: {
     flexDirection: "row",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   detailLabel: {
-    width: 120,
-    fontSize: 14,
+    width: 140,
+    fontSize: 16,
     fontWeight: "600",
-    color: "#666",
+    color: "#666666",
   },
   detailValue: {
     flex: 1,
-    fontSize: 14,
-    color: "#333",
+    fontSize: 16,
+    color: "#333333",
   },
 });

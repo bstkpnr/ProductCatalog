@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface SearchBarProps {
@@ -20,6 +20,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <TextInput
           style={styles.input}
           placeholder="Ürün Ara"
+          placeholderTextColor="#888"
           value={value}
           onChangeText={onChangeText}
           returnKeyType="search"
@@ -37,14 +38,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+    borderRadius: 12,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
+
+    backgroundColor: '#f3f3f3',
+
+    paddingVertical: 8,
     paddingHorizontal: 12,
+    borderRadius: 8,
   },
   icon: {
     marginRight: 8,
@@ -53,5 +64,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     fontSize: 16,
+    color: '#333',
   },
-}); 
+});
