@@ -1,10 +1,14 @@
-<<<<<<< HEAD
-# ![# Product Catalog
-=======
 # Product Catalog
->>>>>>> 9a1815125d80e69e4b05d3da70b82bd55584ed9a
 
 A mobile application built with React Native for browsing and searching products.
+
+## Demo 👋
+
+You can try the application live using the Expo link below:
+
+[![Expo Demo](https://expo.dev/preview/update?message=Added%20Product%20Project&updateRuntimeVersion=1.0.0&createdAt=2025-01-26T21%3A35%3A10.903Z&slug=exp&projectId=d8504113-7e9d-4f40-ba0c-3cebb773a64c&group=6a2e0218-aca5-47e9-ae25-a6a479207c26)
+
+*Note: Please install the Expo app on your device to use this link.*
 
 ## Features
 
@@ -77,10 +81,11 @@ A mobile application built with React Native for browsing and searching products
 ### 👋
 <div class="d-flex align-items-center justify-content-center" style="height: 250px;">
 <img src="assets/images/img4.png" width='200px'>
-<img src="assets/images/img1.png" width='200px'>
 <img src="assets/images/img2.png" width='200px'>
 <img src="assets/images/img3.png" width='200px'>
 <img src="assets/images/img5.png" width='200px'>
 
 
 </div>
+
+
