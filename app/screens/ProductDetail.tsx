@@ -10,50 +10,46 @@ import {
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
+
 import { ImageCarousel } from "../components/ImageCarousel";
 import { ProductDetailSkeleton } from "../components/ProductDetailSkeleton";
 import { ErrorState } from "../components/ErrorState";
+
 import { getProductById } from "../api/productApi";
-import {
-  addToFavorites,
-  removeFromFavorites,
-} from "../store/slices/favoritesSlice";
+import { addToFavorites, removeFromFavorites } from "../store/slices/favoritesSlice";
 import { RootState } from "../store";
 import { IProduct } from "../types/product";
 import { RootStackParamList } from "../_layout";
 
-type ProductDetailScreenRouteProp = RouteProp<
-  RootStackParamList,
-  "ProductDetail"
->;
+type ProductDetailScreenRouteProp = RouteProp<RootStackParamList, "ProductDetail">;
 
 export default function ProductDetail() {
   const route = useRoute<ProductDetailScreenRouteProp>();
   const { id } = route.params;
 
   const dispatch = useDispatch();
+  const favorites = useSelector((state: RootState) => state.favorites.items);
+  const isFavorite = favorites.some((item) => item.id === id);
+
   const [product, setProduct] = useState<IProduct | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
-  const favorites = useSelector((state: RootState) => state.favorites.items);
-  const isFavorite = favorites.some((item) => item.id === id);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
-
-
 
   const loadProduct = async () => {
     try {
       setLoading(true);
       setError(null);
+
       const data = await getProductById(id);
       setProduct(data);
-      setImages([data.thumbnail]); 
+      setImages([data.thumbnail]);
     } catch (err) {
       setError("Ürün yüklenirken bir hata oluştu. Lütfen tekrar deneyin.");
-      setErrorModalVisible(true); 
+      setErrorModalVisible(true);
     } finally {
       setLoading(false);
     }
@@ -64,18 +60,8 @@ export default function ProductDetail() {
   }, [id]);
 
   useEffect(() => {
-    if (product) {
-      const loadAdditionalImages = async () => {
-      
-        if (product.images && product.images.length > 0) {
-          setImages((prevImages) => {
-            const updatedImages = [product.images[0], ...product.images.slice(1)];
-            return updatedImages;
-          });
-        }
-      };
-
-      loadAdditionalImages();
+    if (product?.images?.length) {
+      setImages([product.images[0], ...product.images.slice(1)]);
     }
   }, [product]);
 
@@ -106,73 +92,17 @@ export default function ProductDetail() {
     return <ProductDetailSkeleton />;
   }
 
- 
 
   if (!product && !loading && !error) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.centeredView}>
         <Text>Ürün bulunamadı.</Text>
       </View>
     );
   }
 
-
   return (
-    <ScrollView style={styles.container} bounces={false}>
-      <View style={styles.imageSection}>
-        <ImageCarousel images={images} />
-        {product && product.discountPercentage > 0 && (
-          <View style={styles.discountBadge}>
-            <Text style={styles.discountBadgeText}>
-              -{product.discountPercentage}%
-            </Text>
-          </View>
-        )}
-        <TouchableOpacity
-          onPress={handleToggleFavorite}
-          style={styles.favoriteIcon}
-          activeOpacity={0.7}
-          accessibilityLabel={isFavorite ? "Favorilerden kaldır" : "Favorilere ekle"}
-          accessibilityRole="button"
-        >
-          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-            <Ionicons
-              name={isFavorite ? "heart" : "heart-outline"}
-              size={28}
-              color={isFavorite ? "#FF6B6B" : "#FFFFFF"}
-            />
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{product?.title}</Text>
-        </View>
-
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>${product?.price.toFixed(2)}</Text>
-          {product && product.discountPercentage > 0 && (
-            <Text style={styles.originalPrice}>
-              $
-              {(product.price / (1 - product.discountPercentage / 100)).toFixed(
-                2
-              )}
-            </Text>
-          )}
-        </View>
-
-        <Text
-          style={[
-            styles.stock,
-            { color: product && product.stock > 0 ? "#28a745" : "#dc3545" },
-          ]}
-        >
-          {product && product.stock > 0 ? `Stok: ${product.stock}` : "Stokta Yok"}
-        </Text>
-
-        <Text style={styles.sectionTitle}>Ürün Açıklaması</Text>
-        <Text style={styles.description}>{product?.description}</Text>        
-      </View>
+    <View style={{ flex: 1 }}>
       <ErrorState
         visible={errorModalVisible}
         message={error || ""}
@@ -182,14 +112,78 @@ export default function ProductDetail() {
         }}
         onRequestClose={() => setErrorModalVisible(false)}
       />
-    </ScrollView>
+
+      {product && (
+        <ScrollView style={styles.container} bounces={false}>
+          <View style={styles.imageSection}>
+            <ImageCarousel images={images} />
+            {product.discountPercentage > 0 && (
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountBadgeText}>
+                  -{product.discountPercentage}%
+                </Text>
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={handleToggleFavorite}
+              style={styles.favoriteIcon}
+              activeOpacity={0.7}
+              accessibilityLabel={isFavorite ? "Favorilerden kaldır" : "Favorilere ekle"}
+              accessibilityRole="button"
+            >
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <Ionicons
+                  name={isFavorite ? "heart" : "heart-outline"}
+                  size={28}
+                  color={isFavorite ? "#FF6B6B" : "#FFFFFF"}
+                />
+              </Animated.View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <Text style={styles.title}>{product.title}</Text>
+            </View>
+
+            <View style={styles.priceContainer}>
+              <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+              {product.discountPercentage > 0 && (
+                <Text style={styles.originalPrice}>
+                  $
+                  {(
+                    product.price / (1 - product.discountPercentage / 100)
+                  ).toFixed(2)}
+                </Text>
+              )}
+            </View>
+
+            <Text
+              style={[
+                styles.stock,
+                { color: product.stock > 0 ? "#28a745" : "#dc3545" },
+              ]}
+            >
+              {product.stock > 0 ? `Stok: ${product.stock}` : "Stokta Yok"}
+            </Text>
+
+            <Text style={styles.sectionTitle}>Ürün Açıklaması</Text>
+            <Text style={styles.description}>{product.description}</Text>
+          </View>
+        </ScrollView>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#ffffff",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   imageSection: {
     position: "relative",
@@ -266,25 +260,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: "#555555",
     marginBottom: 24,
-  },
-  details: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    padding: 16,
-  },
-  detailItem: {
-    flexDirection: "row",
-    marginBottom: 12,
-  },
-  detailLabel: {
-    width: 140,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#666666",
-  },
-  detailValue: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333333",
   },
 });

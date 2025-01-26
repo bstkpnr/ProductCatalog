@@ -5,7 +5,6 @@ import {
   StyleSheet,
   RefreshControl,
   ActivityIndicator,
-  Text,
   Dimensions,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -78,6 +77,7 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
           dispatch(appendProducts(response.products));
         }
       } catch (err) {
+        console.error('Ürün yükleme hatası:', err);
         dispatch(
           setError('Ürünler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.')
         );
@@ -95,12 +95,12 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
   const handleRefresh = useCallback(() => {
     dispatch(resetProducts());
     loadProducts(0, true);
-  }, [loadProducts]);
+  }, [dispatch, loadProducts]);
 
   const handleLoadMore = useCallback(() => {
-    if (loading || items.length >= total) return;
+    if (loading || items.length >= total || error) return; 
     loadProducts(skip + limit);
-  }, [loading, items.length, total, skip, limit, loadProducts]);
+  }, [loading, items.length, total, skip, limit, error, loadProducts]);
 
   const handleSearch = useCallback((text: string) => {
     dispatch(setSearchQuery(text));
@@ -130,17 +130,6 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
 
   return (
     <View style={styles.container}>
-      <ErrorState
-        visible={errorModalVisible}
-        message={error || ''}
-        onRetry={() => {
-          setErrorModalVisible(false);
-          dispatch(resetProducts());
-          loadProducts(0, true);
-        }}
-        onRequestClose={() => setErrorModalVisible(false)}
-      />
-
       <SearchBar
         value={searchQuery}
         onChangeText={handleSearch}
@@ -172,17 +161,19 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
             />
           }
           ListFooterComponent={renderFooter}
-          ListEmptyComponent={
-            <View style={styles.centerContainer}>
-              <Text style={styles.emptyText}>
-                {searchQuery
-                  ? 'Aramanızla eşleşen ürün bulunamadı'
-                  : 'Henüz ürün bulunmuyor'}
-              </Text>
-            </View>
-          }
+       
         />
       )}
+      <ErrorState
+        visible={errorModalVisible}
+        message={error || ''}
+        onRetry={() => {
+          setErrorModalVisible(false);
+          dispatch(resetProducts());
+          loadProducts(0, true);
+        }}
+        onRequestClose={() => setErrorModalVisible(false)}
+      />
     </View>
   );
 }
