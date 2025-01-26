@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   FlatList,
@@ -46,30 +46,47 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
     total,
   } = useSelector((state: RootState) => state.products);
 
-  const loadProducts = useCallback(async (skipCount: number = 0, replace: boolean = false) => {
-    try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-      
-      const response = await getProducts(skipCount, limit);
-      
-      dispatch(setPagination({
-        total: response.total,
-        skip: skipCount,
-        limit,
-      }));
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
 
-      if (replace) {
-        dispatch(setProducts(response.products));
-      } else {
-        dispatch(appendProducts(response.products));
-      }
-    } catch (err) {
-      dispatch(setError('Ürünler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.'));
-    } finally {
-      dispatch(setLoading(false));
+  useEffect(() => {
+    if (error) {
+      setErrorModalVisible(true);
+    } else {
+      setErrorModalVisible(false);
     }
-  }, [dispatch, limit]);
+  }, [error]);
+
+  const loadProducts = useCallback(
+    async (skipCount: number = 0, replace: boolean = false) => {
+      try {
+        dispatch(setLoading(true));
+        dispatch(setError(null));
+
+        const response = await getProducts(skipCount, limit);
+
+        dispatch(
+          setPagination({
+            total: response.total,
+            skip: skipCount,
+            limit,
+          })
+        );
+
+        if (replace) {
+          dispatch(setProducts(response.products));
+        } else {
+          dispatch(appendProducts(response.products));
+        }
+      } catch (err) {
+        dispatch(
+          setError('Ürünler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.')
+        );
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch, limit]
+  );
 
   useEffect(() => {
     loadProducts(0, true);
@@ -87,8 +104,7 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
 
   const handleSearch = useCallback((text: string) => {
     dispatch(setSearchQuery(text));
-    
-  }, []);
+  }, [dispatch]);
 
   const filteredItems = items.filter(item =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -112,25 +128,25 @@ export default function ProductList({ navigation }: ProductListScreenProps) {
     );
   };
 
-  if (error) {
-    return (
+  return (
+    <View style={styles.container}>
       <ErrorState
-        message={error}
+        visible={errorModalVisible}
+        message={error || ''}
         onRetry={() => {
+          setErrorModalVisible(false);
           dispatch(resetProducts());
           loadProducts(0, true);
         }}
+        onRequestClose={() => setErrorModalVisible(false)}
       />
-    );
-  }
 
-  return (
-    <View style={styles.container}>
       <SearchBar
         value={searchQuery}
         onChangeText={handleSearch}
         onClear={() => handleSearch('')}
       />
+
       {loading && items.length === 0 ? (
         <FlatList
           data={Array(INITIAL_LOAD_COUNT).fill(null)}

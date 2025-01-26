@@ -1,34 +1,68 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface ErrorStateProps {
-  message: string;
-  onRetry?: () => void;
+interface ErrorStateModalProps {
+  visible: boolean;          
+  message: string;           
+  onRetry?: () => void;     
+  onRequestClose?: () => void; 
 }
 
-export const ErrorState: React.FC<ErrorStateProps> = ({ message, onRetry }) => {
+export const ErrorState: React.FC<ErrorStateModalProps> = ({
+  visible,
+  message,
+  onRetry,
+  onRequestClose,
+}) => {
   return (
-    <View style={styles.container}>
-      <Ionicons name="alert-circle" size={48} color="#F44336" />
-      <Text style={styles.message}>{message}</Text>
-      {onRetry && (
-        <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-          <Ionicons name="refresh" size={20} color="white" style={styles.retryIcon} />
-          <Text style={styles.retryText}>Tekrar Dene</Text>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onRequestClose}
+    >
+      <TouchableOpacity style={styles.backdrop} onPress={onRequestClose}>
+        <TouchableOpacity style={styles.modalContainer} onPress={(e) => e.stopPropagation()}>
+          <Ionicons name="alert-circle" size={48} color="#F44336" />
+          <Text style={styles.message}>{message}</Text>
+
+          {onRetry && (
+            <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+              <Ionicons name="refresh" size={20} color="#FFF" style={styles.retryIcon} />
+              <Text style={styles.retryText}>Tekrar Dene</Text>
+            </TouchableOpacity>
+          )}
+
+          {onRequestClose && (
+            <TouchableOpacity style={styles.closeButton} onPress={onRequestClose}>
+              <Text style={styles.closeButtonText}>Kapat</Text>
+            </TouchableOpacity>
+          )}
         </TouchableOpacity>
-      )}
-    </View>
+      </TouchableOpacity>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  backdrop: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#FFF',
+    borderRadius: 12,
     padding: 20,
-    backgroundColor: 'white',
+    alignItems: 'center',
   },
   message: {
     fontSize: 16,
@@ -49,8 +83,19 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   retryText: {
-    color: 'white',
+    color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
   },
-}); 
+  closeButton: {
+    marginTop: 16,
+    backgroundColor: '#777',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+});

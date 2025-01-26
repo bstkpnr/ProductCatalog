@@ -36,7 +36,7 @@ export default function ProductDetail() {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
   const favorites = useSelector((state: RootState) => state.favorites.items);
   const isFavorite = favorites.some((item) => item.id === id);
 
@@ -53,6 +53,7 @@ export default function ProductDetail() {
       setImages([data.thumbnail]); 
     } catch (err) {
       setError("Ürün yüklenirken bir hata oluştu. Lütfen tekrar deneyin.");
+      setErrorModalVisible(true); 
     } finally {
       setLoading(false);
     }
@@ -105,24 +106,22 @@ export default function ProductDetail() {
     return <ProductDetailSkeleton />;
   }
 
-  if (error) {
-    return <ErrorState message={error} onRetry={loadProduct} />;
-  }
+ 
 
-  if (!product) {
+  if (!product && !loading && !error) {
     return (
-      <ErrorState
-        message="Ürün bulunamadı. Lütfen daha sonra tekrar deneyin."
-        onRetry={loadProduct}
-      />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Ürün bulunamadı.</Text>
+      </View>
     );
   }
+
 
   return (
     <ScrollView style={styles.container} bounces={false}>
       <View style={styles.imageSection}>
         <ImageCarousel images={images} />
-        {product.discountPercentage > 0 && (
+        {product && product.discountPercentage > 0 && (
           <View style={styles.discountBadge}>
             <Text style={styles.discountBadgeText}>
               -{product.discountPercentage}%
@@ -147,12 +146,12 @@ export default function ProductDetail() {
       </View>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>{product.title}</Text>
+          <Text style={styles.title}>{product?.title}</Text>
         </View>
 
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>${product.price.toFixed(2)}</Text>
-          {product.discountPercentage > 0 && (
+          <Text style={styles.price}>${product?.price.toFixed(2)}</Text>
+          {product && product.discountPercentage > 0 && (
             <Text style={styles.originalPrice}>
               $
               {(product.price / (1 - product.discountPercentage / 100)).toFixed(
@@ -165,15 +164,24 @@ export default function ProductDetail() {
         <Text
           style={[
             styles.stock,
-            { color: product.stock > 0 ? "#28a745" : "#dc3545" },
+            { color: product && product.stock > 0 ? "#28a745" : "#dc3545" },
           ]}
         >
-          {product.stock > 0 ? `Stok: ${product.stock}` : "Stokta Yok"}
+          {product && product.stock > 0 ? `Stok: ${product.stock}` : "Stokta Yok"}
         </Text>
 
         <Text style={styles.sectionTitle}>Ürün Açıklaması</Text>
-        <Text style={styles.description}>{product.description}</Text>        
+        <Text style={styles.description}>{product?.description}</Text>        
       </View>
+      <ErrorState
+        visible={errorModalVisible}
+        message={error || ""}
+        onRetry={() => {
+          setErrorModalVisible(false);
+          loadProduct();
+        }}
+        onRequestClose={() => setErrorModalVisible(false)}
+      />
     </ScrollView>
   );
 }
