@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
-  Platform,
 } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +33,7 @@ export default function ProductDetail() {
 
   const dispatch = useDispatch();
   const [product, setProduct] = useState<IProduct | null>(null);
+  const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,12 +42,15 @@ export default function ProductDetail() {
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+
+
   const loadProduct = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await getProductById(id);
       setProduct(data);
+      setImages([data.thumbnail]); 
     } catch (err) {
       setError("Ürün yüklenirken bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
@@ -58,6 +61,22 @@ export default function ProductDetail() {
   useEffect(() => {
     loadProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (product) {
+      const loadAdditionalImages = async () => {
+      
+        if (product.images && product.images.length > 0) {
+          setImages((prevImages) => {
+            const updatedImages = [product.images[0], ...product.images.slice(1)];
+            return updatedImages;
+          });
+        }
+      };
+
+      loadAdditionalImages();
+    }
+  }, [product]);
 
   const handleToggleFavorite = () => {
     if (!product) return;
@@ -102,7 +121,7 @@ export default function ProductDetail() {
   return (
     <ScrollView style={styles.container} bounces={false}>
       <View style={styles.imageSection}>
-        <ImageCarousel images={product.images} />
+        <ImageCarousel images={images} />
         {product.discountPercentage > 0 && (
           <View style={styles.discountBadge}>
             <Text style={styles.discountBadgeText}>
@@ -114,7 +133,7 @@ export default function ProductDetail() {
           onPress={handleToggleFavorite}
           style={styles.favoriteIcon}
           activeOpacity={0.7}
-          accessibilityLabel={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          accessibilityLabel={isFavorite ? "Favorilerden kaldır" : "Favorilere ekle"}
           accessibilityRole="button"
         >
           <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -135,7 +154,10 @@ export default function ProductDetail() {
           <Text style={styles.price}>${product.price.toFixed(2)}</Text>
           {product.discountPercentage > 0 && (
             <Text style={styles.originalPrice}>
-              ${ (product.price / (1 - product.discountPercentage / 100)).toFixed(2)}
+              $
+              {(product.price / (1 - product.discountPercentage / 100)).toFixed(
+                2
+              )}
             </Text>
           )}
         </View>
@@ -150,18 +172,7 @@ export default function ProductDetail() {
         </Text>
 
         <Text style={styles.sectionTitle}>Ürün Açıklaması</Text>
-        <Text style={styles.description}>{product.description}</Text>
-
-        {product.details && (
-          <View style={styles.details}>
-            {Object.entries(product.details).map(([key, value]) => (
-              <View style={styles.detailItem} key={key}>
-                <Text style={styles.detailLabel}>{key}</Text>
-                <Text style={styles.detailValue}>{value}</Text>
-              </View>
-            ))}
-          </View>
-        )}
+        <Text style={styles.description}>{product.description}</Text>        
       </View>
     </ScrollView>
   );

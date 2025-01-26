@@ -13,7 +13,6 @@ interface ImageCarouselProps {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-
 export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -34,8 +33,8 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
       >
         {images.map((image, index) => (
           <Image
-            key={index}
-            source={image}
+            key={index.toString()}
+            source={{ uri: image }}
             style={styles.image}
             contentFit="contain"
             transition={200}
@@ -46,7 +45,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
         <View style={styles.pagination}>
           {images.map((_, index) => (
             <View
-              key={index}
+              key={index.toString()}
               style={[
                 styles.paginationDot,
                 index === activeIndex && styles.paginationDotActive,
@@ -84,4 +83,4 @@ const styles = StyleSheet.create({
   paginationDotActive: {
     backgroundColor: 'white',
   },
-}); 
+});
