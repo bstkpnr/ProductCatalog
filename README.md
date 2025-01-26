@@ -1,50 +1,84 @@
-# Welcome to your Expo app 👋
+![# Product Catalog
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile application built with React Native for browsing and searching products.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Product listing
+- Search functionality with real-time filtering
+- Clean and modern UI design
+- Cross-platform compatibility (iOS & Android)
 
+## Technologies Used
+- React Native
+- Expo
+- TypeScript
+
+- React Native
+- Expo
+- TypeScript
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm or yarn
+- Expo CLI
+- iOS Simulator (for Mac) or Android Studio (for Android development)
+
+### Installation
+
+1. Clone the repository
    ```bash
-   npm install
+   git clone https://github.com/bstkpnr/ProductCatalog.git
+   ```
+2. Navigate to the project directory
+   ```bash
+   cd ProductCatalog
+   ```
+3. Install dependencies
+   ```bash
+   yarn install
+   ```
+4. Start the development server
+   ```bash
+   npx expo start
+   ```
+5. Run the app on iOS
+   ```bash
+   npx expo start --ios
+   ```
+6. Run the app on Android
+   ```bash
+   npx expo start --android
    ```
 
-2. Start the app
+## Third-Party Libraries
 
-   ```bash
-    npx expo start
-   ```
+- @react-native-async-storage/async-storage
+- @react-navigation/bottom-tabs
+- @react-navigation/native
+- @react-navigation/native-stack
+- @react-navigation/stack
+- @reduxjs/toolkit
+- axios
+- expo
+- expo-image
+- react
+- react-dom
+- react-native
+- react-native-safe-area-context
+- react-redux
+- redux-persist
 
-In the output, you'll find options to open the app in a
+### 👋
+<div class="d-flex align-items-center justify-content-center" style="height: 250px;">
+<img src="assets/imgages/img4.png" width='200px'>
+<img src="assets/imgages/img1.png" width='200px'>
+<img src="assets/imgages/img2.png" width='200px'>
+<img src="assets/imgages/img3.png" width='200px'>
+<img src="assets/imgages/img5.png" width='200px'>
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+</div>
