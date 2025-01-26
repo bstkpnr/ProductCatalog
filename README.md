@@ -1,4 +1,4 @@
-![# Product Catalog
+# ![# Product Catalog
 
 A mobile application built with React Native for browsing and searching products.
 
@@ -14,9 +14,7 @@ A mobile application built with React Native for browsing and searching products
 - Expo
 - TypeScript
 
-- React Native
-- Expo
-- TypeScript
+
 
 ## Getting Started
 
