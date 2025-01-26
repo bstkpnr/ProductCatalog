@@ -1,24 +1,30 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
-import ProductList from '../screens/ProductList'
-import ProductDetail from '../screens/ProductDetail'
-import { NavigationIndependentTree } from '@react-navigation/native'
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ProductList from '../screens/ProductList';
+import ProductDetail from '../screens/ProductDetail';
+import { RootStackParamList } from '../_layout';
 
-const Stack = createStackNavigator()
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
 const AppNavigator = () => {
-
   return (
-    <NavigationIndependentTree>
-        <Stack.Navigator initialRouteName="ProductList">
-            <Stack.Screen name="ProductList" component={ProductList} />
-            <Stack.Screen name="ProductDetail" component={ProductDetail} />
-        </Stack.Navigator>
-    </NavigationIndependentTree>
-    
-  )
-}
+    <Stack.Navigator initialRouteName="ProductList">
+      <Stack.Screen 
+        name="ProductList" 
+        component={ProductList} 
+        options={{
+          title: 'Ürünler',
+        }}
+      />
+      <Stack.Screen 
+        name="ProductDetail" 
+        component={ProductDetail} 
+        options={{
+          title: 'Ürün Detayı',
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
-export default AppNavigator
-
-const styles = StyleSheet.create({})
+export default AppNavigator;
