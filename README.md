@@ -63,7 +63,6 @@ You can try the application live using the Expo link below:
 ## Third-Party Libraries
 
 - @react-native-async-storage/async-storage
-- @react-navigation/bottom-tabs
 - @react-navigation/native
 - @react-navigation/native-stack
 - @react-navigation/stack
