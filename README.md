@@ -45,7 +45,7 @@ You can try the application live using the Expo link below:
    ```
 3. Install dependencies
    ```bash
-   yarn install
+   yarn or npm 
    ```
 4. Start the development server
    ```bash
